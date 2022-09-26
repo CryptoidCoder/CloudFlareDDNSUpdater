@@ -6,6 +6,13 @@ import requests
 from dotenv import load_dotenv
 load_dotenv()
 
+# Get Variables From .env file
+cloudflare_zone_id = os.getenv("zone_id")
+complete_cloudflare_record_name = os.getenv("record_name").lower()+ f'.devices.{os.getenv("zone_name")}'
+cloudflare_record_name = os.getenv("record_name").lower()+".devices"
+cloudflare_api_key = os.getenv("cloudflare_Global_API_key")
+cloudflare_api_token = os.getenv("cloudflare_API_token")
+cloudflare_account_email = os.getenv("cloudflare_email")
 
 
 # Functions:
@@ -22,53 +29,82 @@ def addnewline(filename,text): #append text to a new line on a file
         file_object.write(text)
         file_object.close()
 
-def current_ip(): # Get current Public IP
-    url = 'https://ifconfig.me/ip'
-    try:
+def get_current_ip(): # Get current Public IP
+    url = 'https://ifconfig.me/ip' #address of website that will return public IP
+    try: #try and get json data from that website, else return error
         current_public_ip = requests.get(url).text
+        if current_public_ip != None or current_public_ip != ' ':
+            return current_public_ip
+        else:
+            return f"Unable To Get IP From {url}"
     except:
-        print(f"Unable To Get IP From {url}")
+        return f"Unable To Get IP From {url}"
+    
+def get_cloudflare_ip(type): #get IP from cloudflare DNS
+    if type == 'A': #change cloudflare_record_type depending on type listed A/AAAA (IPv4/IPv6)
+        cloudflare_record_type = "A"
+    elif type == 'AAAA':
+        cloudflare_record_type = "AAAA"
+    else:
+        cloudflare_record_type = "A"
 
-def test_api():
-    url= 'https://api.cloudflare.com/client/v4/user/tokens/verify'
-    api_token = os.getenv("cloudflare_API_token")
+    # URL for web request
+    url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/dns_records?name={complete_cloudflare_record_name}&type={cloudflare_record_type}"
 
-    request = requests.get(url, headers = {"Authorization": f"Bearer #{api_token}", "Content-Type":"application/json" })
-    request = request.text
+    # headers for web request (Auth + Content Type)
+    headers = {
+        "X-Auth-Email": cloudflare_account_email,
+        "X-Auth-Key": cloudflare_api_key,
+        "Content-Type": "application/json"
+        }
+    
+    request = requests.get(url, headers = headers) #make web request
 
-    try:
-        first_string, id = request.split('"id":"')
-        id, second_string = id.split('","status"')
-    except:
-        id = 'None'
+    # find the json data that states "content" - which holds the IP
+    for item in request.json()['result']:
+        try:
+            cloudflare_ip = item['content']
+        except:
+            pass
+        try:
+            cloudflare_ip_dns_id = item['id']
+        except:
+            pass
+    
+    return cloudflare_ip, cloudflare_ip_dns_id
 
-    try:
-        first_string, response_text = request.split(',"message":"')
-        response_text, second_string = response_text.split('","type')
-    except:
-        response_text = 'None'
+def update_cloudflare_ip(type): #update DNS value to current Public IP
+    if type == 'A': #change cloudflare_record_type depending on type listed A/AAAA (IPv4/IPv6)
+        cloudflare_record_type = "A"
+    elif type == 'AAAA':
+        cloudflare_record_type = "AAAA"
+    else:
+        cloudflare_record_type = "A"
 
-    try:
-        first_string, response_code = request.split('"code":')
-        response_code, second_string = response_code.split(',"message":')
-    except:
-        response_code = 'None'
+    current_ip = get_current_ip() #get current IP using get_current_IP() function
+    cloudflare_ip, cloudflare_dns_id = get_cloudflare_ip(cloudflare_record_type) #get DNS ID & cloudflare IP from Cloudfalre DNS
 
-    try:
-        first_string, response_status = request.split('"status":"')
-        response_status, second_string = response_status.split('"},"success"')
-    except:
-        response_status = 'None'
+    # URL for web request
+    url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/dns_records/{cloudflare_dns_id}"
 
-    return id, response_text, response_code, response_status, request
+    #headers for web request (Auth + Content Type)
+    headers = {
+        "X-Auth-Email": cloudflare_account_email,
+        "X-Auth-Key": cloudflare_api_key,
+        "Content-Type": "application/json"
+        }
 
-id, response_text, response_code, response_status, request = test_api()
-
-
-# Get Current cloudflare DNS IP
-
-# if different:
-    # Update Cloudflare DNS With public IP
+    # data for web request (IPv4/IPv6 Record type, record name, new IP)
+    data={
+        "type":cloudflare_record_type,
+        "name":cloudflare_record_name,
+        "content":current_ip,
+        "proxied":bool('true'),
+        "ttl":120
+        }
+    
+    request = requests.put(url, headers=headers, json= data) #Make web request
+    return request.json()
 
 
 #setup:
@@ -93,9 +129,9 @@ else:
     print("Already Setup.")
 
 
-#main:
+# Main:
 
-if id != 'None' and response_text != 'None' and response_code != 'None' and response_status != 'None':
-    print("API Token works")
-else:
-    print("API Token Doesn't Work")
+cloudflare_ip, cloudflare_dns_id = get_cloudflare_ip('A')
+if cloudflare_ip != get_current_ip(): #if IP has changed
+    update_cloudflare_ip('A')
+    print(f"Updated 'A' IP: {get_cloudflare_ip('A')[0]}")
