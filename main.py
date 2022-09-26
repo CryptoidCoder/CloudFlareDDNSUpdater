@@ -108,30 +108,37 @@ def update_cloudflare_ip(type): #update DNS value to current Public IP
 
 
 #setup:
-this_file_path = os.path.dirname(os.path.realpath(__file__))
-env_file_path = this_file_path + '\.env'
+this_file_dir_path = os.path.dirname(os.path.realpath(__file__))
+env_file_path = this_file_dir_path + '\.env'
 
-if not os.path.exists(env_file_path): #if ENV file doesn't exist, run setup
-    print("Not Already Setup... Setting Up...")
-    cloudflare_zone_name = input("What Is your Cloudflare Zone Name? E.g. example.com ")
-    cloudflare_zone_id = input("What Is your Cloudflare Zone ID? ")
-    device_name = input("What Is Your Device Name? E.g. CryptoidCoders_Laptop ")
-    cloudflare_API_token = input("What Is Your CloudFlare API Token? ")
-    cloudflare_global_API_key = input("What Is Your Globla CloudFlare API Key? ")
-    cloudflare_email = input("What Is Your CloudFlare Email? ")
-    addnewline(env_file_path, f"zone_name='{cloudflare_zone_name}'")
-    addnewline(env_file_path, f"zone_id='{cloudflare_zone_id}'")
-    addnewline(env_file_path, f"record_name='{device_name}'")
-    addnewline(env_file_path, f"cloudflare_api_token='{cloudflare_API_token}'")
-    addnewline(env_file_path, f"cloudflare_global_api_key='{cloudflare_global_API_key}'")
-    addnewline(env_file_path, f"cloudflare_email='{cloudflare_email}'")
+if not os.path.exists(env_file_path): #if .env file doesn't exist, run setup
+    print(".env File Not Already Setup... Setting Up...")
+    cloudflare_zone_name = input("What Is your Cloudflare Zone Name? E.g. example.com ") #Ask For CloudFlare Zone Name & Save To Variable
+    cloudflare_zone_id = input("What Is your Cloudflare Zone ID? ") #Ask For CloudFlare Zone ID & Save To Variable
+    device_name = input("What Is Your Device Name? E.g. CryptoidCoders_Laptop ") #Ask For Device Name (cloudFlare Record Name) & Save To Variable
+    cloudflare_API_token = input("What Is Your CloudFlare API Token? ") #Ask For CloudFlare API Token & Save To Variable
+    cloudflare_global_API_key = input("What Is Your Globla CloudFlare API Key? ") #Ask For CloudFlare APi Key & Save To Variable
+    cloudflare_email = input("What Is Your CloudFlare Email? ") #Ask For CloudFlare Account Email & Save To Variable
+    addnewline(env_file_path, f"zone_name='{cloudflare_zone_name}'") #Write CloudFlare Zone Name To .env File
+    addnewline(env_file_path, f"zone_id='{cloudflare_zone_id}'") #Write CloudFlare Zone ID To .env File
+    addnewline(env_file_path, f"record_name='{device_name}'") #Write CloudFlare Record Name To .env File
+    addnewline(env_file_path, f"cloudflare_api_token='{cloudflare_API_token}'") #Write CloudFlare API Token To .env File
+    addnewline(env_file_path, f"cloudflare_global_api_key='{cloudflare_global_API_key}'") #Write CloudFlare API Key To .env File
+    addnewline(env_file_path, f"cloudflare_email='{cloudflare_email}'") #Write CloudFlare Account Email To .env File
 else:
-    print("Already Setup.")
+    print(".env File Already Setup.")
+
+cmd_file_path = this_file_dir_path + '\CloudFlareDDNSUpdater.cmd'
+this_file_path = this_file_dir_path + '\main.py'
+if not os.path.exists(cmd_file_path): #if CloudFlareDDNSUpdater.cmd file doesn't exist, run setup
+    print("CloudFlareDDNSUpdater.cmd File Not Already Setup... Setting Up...")
+    addnewline(cmd_file_path, f'python "{this_file_path}"')
+else:
+    print("CloudFlareDDNSUpdater.cmd File Already Setup")
 
 
 # Main:
 
-cloudflare_ip, cloudflare_dns_id = get_cloudflare_ip('A')
-if cloudflare_ip != get_current_ip(): #if IP has changed
+if get_cloudflare_ip('A')[0] != get_current_ip(): #if IP has changed then update DNS
     update_cloudflare_ip('A')
     print(f"Updated 'A' IP: {get_cloudflare_ip('A')[0]}")
