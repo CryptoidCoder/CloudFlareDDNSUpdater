@@ -8,7 +8,7 @@ load_dotenv()
 
 # Get Variables From .env file
 cloudflare_zone_id = os.getenv("zone_id")
-complete_cloudflare_record_name = os.getenv("record_name").lower()+ f'.devices.{os.getenv("zone_name")}'
+complete_cloudflare_record_name = os.getenv("record_name").lower()+ f'.{os.getenv("zone_name")}'
 cloudflare_record_name = os.getenv("record_name").lower()+".devices"
 cloudflare_api_key = os.getenv("cloudflare_Global_API_key")
 cloudflare_api_token = os.getenv("cloudflare_API_token")
@@ -52,13 +52,13 @@ def get_cloudflare_ip(type): #get IP from cloudflare DNS
     url = f"https://api.cloudflare.com/client/v4/zones/{cloudflare_zone_id}/dns_records?name={complete_cloudflare_record_name}&type={cloudflare_record_type}"
 
     # headers for web request (Auth + Content Type)
-    headers = {
-        "X-Auth-Email": cloudflare_account_email,
+    myheaders = {
+        "Content-Type": "application/json",
         "X-Auth-Key": cloudflare_api_key,
-        "Content-Type": "application/json"
+        "X-Auth-Email": cloudflare_account_email      
         }
     
-    request = requests.get(url, headers = headers) #make web request
+    request = requests.get(url, headers = myheaders) #make web request
 
     # find the json data that states "content" - which holds the IP
     for item in request.json()['result']:
@@ -70,6 +70,7 @@ def get_cloudflare_ip(type): #get IP from cloudflare DNS
             cloudflare_ip_dns_id = item['id']
         except:
             pass
+
     
     return cloudflare_ip, cloudflare_ip_dns_id
 
