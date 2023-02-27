@@ -3,6 +3,9 @@
 ## This Will Update Your Cloudflare DNS With Your Devices Public IP
 
 ### Usage:
+`python -m venv venv`
+Linux: `source venv/bin/activate` Windows: `./venv/Scripts/activate.bat`
+`pip install -r requirements.txt`
 `python main.py`
 
 
@@ -13,7 +16,7 @@
 - Linux:
 - - `crontab -e`
 - - Then Add The Following:
-- - - `@reboot python3 /path/to/this/directory/main.py`
+- - - `@reboot python3 /path/to/this/directory/CloudFlareDDNSUpdater.sh`
 
 - Windows:
 - - Copy The Included `CloudFlareDDNSUpdater.cmd` File Into `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup`
