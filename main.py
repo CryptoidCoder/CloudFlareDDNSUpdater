@@ -139,7 +139,7 @@ else:
 
 shell_file_path = os.path.join(this_file_dir_path, 'CloudFlareDDNSUpdater.sh')
 if not os.path.exists(shell_file_path): #if CloudFlareDDNSUpdater.sh file doesn't exist, run setup
-    print("CloudFlareDDNSUpdater.cmd File Not Already Setup... Setting Up...")
+    print("CloudFlareDDNSUpdater.sh File Not Already Setup... Setting Up...")
     addnewline(shell_file_path, f'python "{this_file_path}"')
 else:
     print("CloudFlareDDNSUpdater.sh File Already Setup")
