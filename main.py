@@ -137,9 +137,19 @@ if not os.path.exists(cmd_file_path): #if CloudFlareDDNSUpdater.cmd file doesn't
 else:
     print("CloudFlareDDNSUpdater.cmd File Already Setup")
 
+shell_file_path = this_file_dir_path + '\CloudFlareDDNSUpdater.sh'
+if not os.path.exists(shell_file_path): #if CloudFlareDDNSUpdater.sh file doesn't exist, run setup
+    print("CloudFlareDDNSUpdater.cmd File Not Already Setup... Setting Up...")
+    addnewline(shell_file_path, f'python "{this_file_path}"')
+else:
+    print("CloudFlareDDNSUpdater.sh File Already Setup")
+
 
 # Main:
 
 if get_cloudflare_ip('A')[0] != get_current_ip(): #if IP has changed then update DNS
     update_cloudflare_ip('A')
     print(f"Updated 'A' IP: {get_cloudflare_ip('A')[0]}")
+else: #otherwise do nothing
+    print(f'Current IP: {get_current_ip()} - Unchanged from DNS')
+

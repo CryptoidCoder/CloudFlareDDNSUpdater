@@ -10,3 +10,5 @@
 testing.py
 
 #Project Specific:
+CloudFlareDDNSUpdater.cmd
+CloudFlareDDNSUpdater.sh
