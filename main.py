@@ -133,9 +133,9 @@ cmd_file_path = os.path.join(this_file_dir_path,'CloudFlareDDNSUpdater.cmd')
 this_file_path = os.path.join(this_file_dir_path, 'main.py')
 if not os.path.exists(cmd_file_path): #if CloudFlareDDNSUpdater.cmd file doesn't exist, run setup
     print("CloudFlareDDNSUpdater.cmd File Not Already Setup... Setting Up...")
-    addnewline(cmd_file_path, f"{os.path.join(this_file_dir_path,'/venv/Scripts/activate.bat')}") #activate venv
+    addnewline(cmd_file_path, f'{os.path.join(this_file_dir_path,"/venv/Scripts/activate.bat")}') #activate venv
     addnewline(cmd_file_path, f'python "{this_file_path}"') #run file
-    addnewline(cmd_file_path, f"{os.path.join(this_file_dir_path,'/venv/Scripts/deactivate.bat')}") #deactivate venv
+    addnewline(cmd_file_path, f'{os.path.join(this_file_dir_path,"/venv/Scripts/deactivate.bat")}') #deactivate venv
 
 else:
     print("CloudFlareDDNSUpdater.cmd File Already Setup")
@@ -143,7 +143,7 @@ else:
 shell_file_path = os.path.join(this_file_dir_path, 'CloudFlareDDNSUpdater.sh')
 if not os.path.exists(shell_file_path): #if CloudFlareDDNSUpdater.sh file doesn't exist, run setup
     print("CloudFlareDDNSUpdater.sh File Not Already Setup... Setting Up...")
-    addnewline(shell_file_path, f"source {os.path.join(this_file_dir_path,'venv/bin/activate')}") #activate venv
+    addnewline(shell_file_path, f'source {os.path.join(this_file_dir_path,"venv/bin/activate")}') #activate venv
     addnewline(shell_file_path, f'python3 "{this_file_path}"') #run script
     addnewline(shell_file_path, f'deactivate') #deactivate venv
 else:
